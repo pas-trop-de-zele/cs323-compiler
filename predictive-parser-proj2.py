@@ -1,39 +1,74 @@
+VALID_CHARS = "EQTRFa+-*/()$"
+
 lookup = {
-    "E":    {"i": "TQ",       "+": "INVALID", "*": "INVALID", "(": "TQ",       ")": "INVALID", "$": "INVALID"},
-    "Q":   {"i": "INVALID'",  "+": "+TQ",    "*": "INVALID", "(": "INVALID'",  ")": "EPSILON", "$": "EPSILON"},
-    "T":    {"i": "FR",       "+": "INVALID", "*": "INVALID", "(": "FR",       ")": "INVALID", "$": "INVALID"},
-    "R":   {"i": "INVALID'",  "+": "EPSILON", "*": "*FR",    "(": "INVALID'",  ")": "EPSILON", "$": "EPSILON"},
-    "F":    {"i": "i",         "+": "INVALID", "*": "INVALID", "(": "(E)",       ")": "INVALID", "$": "INVALID"},
+    "E":    {"a": "TQ", "+": "",        "-": "",        "*": "",    "/": "",     "(": "TQ",     ")": "",        "$": ""},
+    "Q":    {"a": "",   "+": "+TQ",     "-": "-TQ",     "*": "",    "/": "",     "(": "",       ")": "EPSILON", "$": "EPSILON"},
+    "T":    {"a": "FR", "+": "",        "-": "",        "*": "",    "/": "",     "(": "FR",     ")": "",        "$": ""},
+    "R":    {"a": "",   "+": "EPSILON", "-": "EPSILON", "*": "*FR", "/": "/FR",  "(": "",       ")": "EPSILON", "$": "EPSILON"},
+    "F":    {"a": "a",  "+": "",        "-": "",        "*": "",    "/": "",     "(": "(E)",    ")": "",        "$": ""},
 }
 
-STARTING_STATE = "E"
-input = "i+i*i$"
-stack = [STARTING_STATE]
 
-while stack:
-    current_state = stack[-1]
-    removal = False
+def is_valid(string):
+    for c in string:
+        if c not in VALID_CHARS:
+            print(f"INVALID CHAR: {c}")
+            return False
+    return True
 
-    if current_state == input[0]:
-        removal = True
-        action = f"Remove {current_state}"
-    else:
-        next_state = lookup[current_state][input[0]]
-        action = f"{current_state} -> {next_state}"
 
-        if next_state == "INVALID":
-            print("INVALID INPUT")
-            break
+def remove_space(string):
+    no_space_string = ""
+    for char in string:
+        if char.isspace():
+            continue
+        no_space_string += char
+    return no_space_string
 
-    print(('$' + ''.join(stack)).ljust(10), input.ljust(10), action.ljust(10))
 
-    stack.pop()
+while True:
+    string = input("\nPlease enter string with $ ending: ")
+    if string == "Q":
+        break
+    # Remove all spaces
+    string = remove_space(string)
+    if not is_valid(string):
+        continue
 
-    if removal:
-        input = input[1:]
-    else:
-        if next_state != "EPSILON":
-            for char in reversed(next_state):
-                stack.append(char)
+    print(f"--------------------CHECKING {string}--------------------")
+    STARTING_STATE = "E"
+    stack = [STARTING_STATE]
+
+    while stack:
+        current_state = stack[-1]
+        removal = False
+
+        if current_state == string[0]:
+            removal = True
+            action = f"Remove {current_state}"
+        else:
+            next_state = lookup[current_state][string[0]]
+            action = f"{current_state} -> {next_state}"
+
+            if not next_state:
+                print(('$' + ''.join(stack)).ljust(10),
+                      string.ljust(10), action.ljust(10))
+                print("INVALID INPUT")
+                print(
+                    f"There is no next state for the {current_state} at {string[0]}")
+                break
+
+        print(('$' + ''.join(stack)).ljust(10),
+              string.ljust(10), action.ljust(10))
+
+        stack.pop()
+
+        if removal:
+            string = string[1:]
+        else:
+            # We appending nothing for EPSILON
+            if next_state != "EPSILON":
+                for char in reversed(next_state):
+                    stack.append(char)
 
 print("\texit...")
