@@ -13,7 +13,14 @@ def is_valid(string):
     for c in string:
         if c not in VALID_CHARS:
             print(f"INVALID CHAR: {c}")
+            print(f"Valid chars: {VALID_CHARS}")
             return False
+    return True
+
+def is_terminated(string):
+    if string and string[-1] != '$':
+        print(f"Please terminate input with $ at the end")
+        return False
     return True
 
 
@@ -32,7 +39,7 @@ while True:
         break
     # Remove all spaces
     string = remove_space(string)
-    if not is_valid(string):
+    if not is_valid(string) or not is_terminated(string):
         continue
 
     print(f"--------------------CHECKING {string}--------------------")
