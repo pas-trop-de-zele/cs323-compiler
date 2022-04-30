@@ -1,9 +1,10 @@
 OPERATIONS = '+-*/'
+TERMINAL_CHAR = '$'
 
 
 def is_valid(string):
     for c in string:
-        if not c.isalnum() and c not in OPERATIONS:
+        if not c.isalnum() and c not in OPERATIONS and c != TERMINAL_CHAR:
             print(f"INVALID CHAR: {c}")
             return False
     return True
@@ -24,7 +25,7 @@ def get_chars(string):
     chars = []
     chars_set = set()
     for c in string:
-        if c not in OPERATIONS and c not in chars_set:
+        if c not in OPERATIONS and c != TERMINAL_CHAR and c not in chars_set:
             chars.append(c)
             chars_set.add(c)
     return chars
@@ -70,4 +71,6 @@ while True:
                 stack.append(str(a * b))
             elif c == '/':
                 stack.append(str(a // b))
+            elif c == '$':
+                break
     print(stack[0])
